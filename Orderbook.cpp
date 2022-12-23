@@ -46,22 +46,22 @@ class Orderbook
                         if (newOrder->qty >= tmp->qty) {
                             if (removeOrder(tmp->id, "sell")) {
                                 newOrder->qty -= tmp->qty;
-                                outputOrderFill(tmp->id, tmp->qty, newOrder->price, "full");
+                                outputOrderFill(tmp->id, tmp->qty, tmp->price, "full");
                                 fillStatus = 0;
 
                                 if (newOrder->qty == 0) {
-                                    outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "full");
+                                    outputOrderFill(newOrder->id, newOrder->qty, tmp->price, "full");
                                     return 1;    
                                 } else {
-                                    outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "partial");
+                                    outputOrderFill(newOrder->id, newOrder->qty, tmp->price, "partial");
                                 }
                             } else {
                                 cout << "Attempted to match buy order " << newOrder->id << " with sell order " << tmp->id << " but failed" << endl;
                             }
                         } else {
                             tmp->qty -= newOrder->qty;
-                            outputOrderFill(tmp->id, tmp->qty, newOrder->price, "partial");
-                            outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "full");
+                            outputOrderFill(tmp->id, tmp->qty, tmp->price, "partial");
+                            outputOrderFill(newOrder->id, newOrder->qty, tmp->price, "full");
                             return 1;
                         }
                     } else {
@@ -76,22 +76,22 @@ class Orderbook
                         if (newOrder->qty >= tmp->qty) {
                             if (removeOrder(tmp->id, "buy")) {
                                 newOrder->qty -= tmp->qty;
-                                outputOrderFill(tmp->id, tmp->qty, newOrder->price, "full");
+                                outputOrderFill(tmp->id, tmp->qty, tmp->price, "full");
                                 fillStatus = 0;
 
                                 if (newOrder->qty == 0) {
-                                    outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "full");
+                                    outputOrderFill(newOrder->id, newOrder->qty, tmp->price, "full");
                                     return 1;    
                                 } else {
-                                    outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "partial");
+                                    outputOrderFill(newOrder->id, newOrder->qty, tmp->price, "partial");
                                 }
                             } else {
                                 cout << "Attempted to match sell order " << newOrder->id << " with buy order " << tmp->id << " but failed" << endl;
                             }
                         } else {
                             tmp->qty -= newOrder->qty;
-                            outputOrderFill(tmp->id, tmp->qty, newOrder->price, "partial");
-                            outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "full");
+                            outputOrderFill(tmp->id, tmp->qty, tmp->price, "partial");
+                            outputOrderFill(newOrder->id, newOrder->qty, tmp->price, "full");
                             return 1;
                         }
                     } else {

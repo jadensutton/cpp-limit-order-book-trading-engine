@@ -86,7 +86,7 @@ class OrderInputProcessor {
                 return true;
             }
 
-            
+            rejectOrder("Too few or too many parameters");
             return false;
         }
 };
