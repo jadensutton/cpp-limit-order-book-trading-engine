@@ -29,8 +29,8 @@ class Orderbook
                 tmp = asksHead;
                 while (tmp != NULL) {
                     if (newOrder->price >= tmp->price) {
-                        if (newOrder->qty > tmp->qty) {
-                            if (removeOrder(tmp->id, "buy")) {
+                        if (newOrder->qty >= tmp->qty) {
+                            if (removeOrder(tmp->id, "sell")) {
                                 newOrder->qty -= tmp->qty;
                                 cout << "ORDER " << tmp->id << " FILLED" << endl;
                                 fillStatus = 0;

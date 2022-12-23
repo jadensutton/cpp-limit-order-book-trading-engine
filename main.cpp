@@ -14,7 +14,9 @@ int main() {
         int qty;
         float price;
 
-        if (orderInputProcessor.process(line, &side, &qty, &price)) {
+        if (line == "print") {
+            orderbook.printOrderbook();
+        } else if (orderInputProcessor.process(line, &side, &qty, &price)) {
             int id;
             id = orderbook.addOrder(side, qty, price);
             if (id != 0) {
