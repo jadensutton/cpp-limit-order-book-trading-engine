@@ -14,7 +14,21 @@ class Orderbook
 {
     private:
         order *bidsHead, *asksHead;
-        int bidId, askId;
+        int orderId;
+
+        void outputOrderFill(int id, int qty, float price, string type) {
+            /// @brief Method to print out order fill notifications
+            /// @param id pointer to new order
+            /// @param qty order side
+            /// @param price order price
+            /// @param type fill type
+
+            if (type == "full") {
+                cout << "ORDER " << id << " FILLED @ " << price << endl;
+            } else if (type == "partial") {
+                cout << "ORDER " << id << " PARTIALLY FILLED @ " << price << " REMAINING QTY = " << qty << endl;
+            }
+        }
 
         int lookForMatch(order *newOrder, string side) {
             /// @brief Method will try to match a newly submitted order with an existing order in the order book
@@ -32,19 +46,22 @@ class Orderbook
                         if (newOrder->qty >= tmp->qty) {
                             if (removeOrder(tmp->id, "sell")) {
                                 newOrder->qty -= tmp->qty;
-                                cout << "ORDER " << tmp->id << " FILLED" << endl;
+                                outputOrderFill(tmp->id, tmp->qty, newOrder->price, "full");
                                 fillStatus = 0;
 
                                 if (newOrder->qty == 0) {
-                                    cout << "NEW ORDER FILLED" << endl;
+                                    outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "full");
                                     return 1;    
+                                } else {
+                                    outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "partial");
                                 }
                             } else {
                                 cout << "Attempted to match buy order " << newOrder->id << " with sell order " << tmp->id << " but failed" << endl;
                             }
                         } else {
                             tmp->qty -= newOrder->qty;
-                            cout << "NEW ORDER FILLED" << endl;
+                            outputOrderFill(tmp->id, tmp->qty, newOrder->price, "partial");
+                            outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "full");
                             return 1;
                         }
                     } else {
@@ -59,19 +76,22 @@ class Orderbook
                         if (newOrder->qty >= tmp->qty) {
                             if (removeOrder(tmp->id, "buy")) {
                                 newOrder->qty -= tmp->qty;
-                                cout << "ORDER " << tmp->id << " FILLED" << endl;
+                                outputOrderFill(tmp->id, tmp->qty, newOrder->price, "full");
                                 fillStatus = 0;
 
                                 if (newOrder->qty == 0) {
-                                    cout << "NEW ORDER FILLED" << endl;
+                                    outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "full");
                                     return 1;    
+                                } else {
+                                    outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "partial");
                                 }
                             } else {
                                 cout << "Attempted to match sell order " << newOrder->id << " with buy order " << tmp->id << " but failed" << endl;
                             }
                         } else {
                             tmp->qty -= newOrder->qty;
-                            cout << "NEW ORDER FILLED" << endl;
+                            outputOrderFill(tmp->id, tmp->qty, newOrder->price, "partial");
+                            outputOrderFill(newOrder->id, newOrder->qty, newOrder->price, "full");
                             return 1;
                         }
                     } else {
@@ -88,8 +108,7 @@ class Orderbook
         Orderbook() {
             bidsHead = NULL;
             asksHead = NULL;
-            bidId = 1;
-            askId = 1;
+            orderId = 1;
         }
 
         void printOrderbook() {
@@ -160,6 +179,8 @@ class Orderbook
             /// @return 0 if immediate fill, order id otherwise
 
             order *newOrder = new order;
+            newOrder->id = orderId;
+            orderId += 1;
             newOrder->next = NULL;
             newOrder->qty = qty;
             newOrder->price = price;
@@ -169,9 +190,6 @@ class Orderbook
             }
 
             if (side == "buy") {
-                newOrder->id = bidId;
-                bidId += 1;
-
                 if(bidsHead == NULL) {
                     bidsHead = newOrder;
                 } else if (newOrder-> price > bidsHead->price) {
@@ -194,9 +212,6 @@ class Orderbook
                     }
                 }
             } else if (side == "sell") {
-                newOrder->id = askId;
-                askId += 1;
-
                 if(asksHead == NULL) {
                     asksHead = newOrder;
                 } else if (newOrder-> price < asksHead->price) {
