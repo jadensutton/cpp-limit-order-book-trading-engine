@@ -18,7 +18,7 @@ class Orderbook
 
         void outputOrderFill(int id, int qty, float price, string type) {
             /// @brief Method to print out order fill notifications
-            /// @param id pointer to new order
+            /// @param id order id
             /// @param qty order side
             /// @param price order price
             /// @param type fill type
@@ -26,8 +26,59 @@ class Orderbook
             if (type == "full") {
                 cout << "ORDER " << id << " FILLED @ " << price << endl;
             } else if (type == "partial") {
-                cout << "ORDER " << id << " PARTIALLY FILLED @ " << price << " REMAINING QTY = " << qty << endl;
+                cout << "ORDER " << id << " PARTIALLY FILLED @ " << price << " - REMAINING QTY = " << qty << endl;
             }
+        }
+
+        void outputOrderCancel(int id) {
+            /// @brief Method to print out order cancel notifications
+            /// @param id order id
+
+            cout << "ORDER " << id << " CANCELLED" << endl;
+        }
+
+        bool removeOrder(int id, string side) {
+            /// @brief Method will remove an order from the orderbook
+            /// @param id order id
+            /// @param side order side
+            /// @return true if order successfully removed, false otherwise
+            
+            order *tmp;
+            if (side == "buy") {
+                tmp = bidsHead;
+                if (tmp) {
+                    if (id == tmp->id) {
+                        bidsHead = bidsHead->next;
+                        return true;
+                    }
+
+                    while (tmp->next != NULL) {
+                        if (id == tmp->next->id) {
+                            tmp->next = tmp->next->next;
+                            return true;
+                        }
+                        tmp = tmp->next;
+                    }
+                }
+            } else if (side == "sell") {
+                tmp = asksHead;
+                if (tmp) {
+                    if (id == tmp->id) {
+                        asksHead = asksHead->next;
+                        return true;
+                    }
+
+                    while (tmp->next != NULL) {
+                        if (id == tmp->next->id) {
+                            tmp->next = tmp->next->next;
+                            return true;
+                        }
+                        tmp = tmp->next;
+                    }
+                }
+            }
+
+            return false;
         }
 
         int lookForMatch(order *newOrder, string side) {
@@ -130,45 +181,7 @@ class Orderbook
             }
         }
 
-        bool removeOrder(int id, string side) {
-            /// @brief Method will remove an order from the orderbook
-            /// @param id order id
-            /// @param side order side
-            /// @return true if order successfully removed, false otherwise
-            
-            order *tmp;
-            if (side == "buy") {
-                tmp = bidsHead;
-                if (id == tmp->id) {
-                    bidsHead = bidsHead->next;
-                    return true;
-                }
 
-                while (tmp->next != NULL) {
-                    if (id == tmp->next->id) {
-                        tmp->next = tmp->next->next;
-                        return true;
-                    }
-                    tmp = tmp->next;
-                }
-            } else if (side == "sell") {
-                tmp = asksHead;
-                if (id == tmp->id) {
-                    asksHead = asksHead->next;
-                    return true;
-                }
-
-                while (tmp->next != NULL) {
-                    if (id == tmp->next->id) {
-                        tmp->next = tmp->next->next;
-                        return true;
-                    }
-                    tmp = tmp->next;
-                }
-            }
-
-            return false;
-        }
 
         int addOrder(string side, int qty, float price)
         {
@@ -235,6 +248,19 @@ class Orderbook
                 }
             }
             
+            cout << "ORDER PLACED - ID = " << newOrder->id << endl;
             return newOrder->id;
+        }
+
+        void cancelOrder(int id, string side) {
+            /// @brief Method will cancel an order
+            /// @param id order id
+            /// @param side order side
+
+            if (removeOrder(id, side)) {
+                outputOrderCancel(id);
+            } else {
+                cout << "ORDER NOT FOUND" << endl;
+            }
         }
 };

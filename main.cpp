@@ -10,17 +10,19 @@ int main() {
 
     for (string line; getline(cin, line);)
     {
+        string command;
+        int id;
         string side;
         int qty;
         float price;
 
-        if (line == "print") {
-            orderbook.printOrderbook();
-        } else if (orderInputProcessor.process(line, &side, &qty, &price)) {
-            int id;
-            id = orderbook.addOrder(side, qty, price);
-            if (id != 0) {
-                cout << "Order placed - Id = " << id << endl;
+        if (orderInputProcessor.process(line, &command, &id, &side, &qty, &price)) {
+            if (command == "place") {
+                id = orderbook.addOrder(side, qty, price);
+            } else if (command == "cancel") {
+                orderbook.cancelOrder(id, side);
+            } else if (command == "print") {
+                orderbook.printOrderbook();
             }
         };
     }
